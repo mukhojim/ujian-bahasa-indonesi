@@ -1,0 +1,1624 @@
+<index.html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Bahasa Indonesia - TKA SMA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .question-card {
+            transition: all 0.3s ease;
+        }
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        @media print {
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg border-b-4 border-blue-600">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">📚</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Ujian Bahasa Indonesia</h1>
+                        <p class="text-sm text-gray-600">Tes Kemampuan Akademik - SMA Kelas XII</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#" onclick="openTeacherPage()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        Portal Guru
+                    </a>
+                    <div id="timer" class="bg-red-100 text-red-800 px-4 py-2 rounded-lg font-mono font-bold">
+                        90:00
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+
+
+        <!-- Student Info -->
+        <div id="studentInfo" class="bg-white rounded-xl shadow-lg p-6 mb-8 fade-in">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Informasi Siswa</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                    <input type="text" id="studentName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Masukkan nama lengkap">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Kelas</label>
+                    <select id="studentClass" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Pilih Kelas</option>
+                        <option value="XII SATU">XII SATU</option>
+                        <option value="XII DUA">XII DUA</option>
+                        <option value="XII TIGA">XII TIGA</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Absen</label>
+                    <input type="number" id="studentNumber" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="No. Absen" min="1" max="40">
+                </div>
+            </div>
+            <button id="startExam" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+                Mulai Ujian
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progressSection" class="bg-white rounded-xl shadow-lg p-6 mb-8 hidden">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-700">Progress Ujian</span>
+                <span id="progressText" class="text-sm text-gray-600">0/30</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="progressBar" class="progress-bar bg-blue-600 h-3 rounded-full" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Question Container -->
+        <div id="questionContainer" class="hidden">
+            <!-- Questions will be dynamically inserted here -->
+        </div>
+
+        <!-- Navigation -->
+        <div id="navigation" class="hidden bg-white rounded-xl shadow-lg p-6 mt-8">
+            <div class="flex justify-between items-center">
+                <button id="prevBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50" disabled>
+                    ← Sebelumnya
+                </button>
+                <div class="flex space-x-2">
+                    <button id="reviewBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                        Review Jawaban
+                    </button>
+                    <button id="submitBtn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                        Selesai Ujian
+                    </button>
+                </div>
+                <button id="nextBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    Selanjutnya →
+                </button>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="hidden bg-white rounded-xl shadow-lg p-8 fade-in">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-4xl">🎉</span>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Ujian Selesai!</h2>
+                <p class="text-gray-600">Terima kasih telah mengerjakan ujian Bahasa Indonesia</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-blue-50 rounded-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-blue-600" id="finalScore">0</div>
+                    <div class="text-sm text-gray-600 mt-1">Skor Akhir</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-green-600" id="correctAnswers">0</div>
+                    <div class="text-sm text-gray-600 mt-1">Jawaban Benar</div>
+                </div>
+                <div class="bg-red-50 rounded-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-red-600" id="wrongAnswers">0</div>
+                    <div class="text-sm text-gray-600 mt-1">Jawaban Salah</div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button id="restartBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+                    Mulai Ujian Baru
+                </button>
+            </div>
+        </div>
+
+
+
+
+    </main>
+
+    <script>
+        // Questions data with passages
+        const questionsData = [
+            // Pilihan Ganda Biasa (10 soal)
+            {
+                type: 'multiple-choice',
+                passage: `Dalam era digital saat ini, literasi digital menjadi keterampilan yang sangat penting bagi generasi muda. Literasi digital tidak hanya sebatas kemampuan menggunakan teknologi, tetapi juga mencakup kemampuan untuk memahami, mengevaluasi, dan menggunakan informasi digital secara kritis dan bertanggung jawab. Generasi Z, yang lahir di era internet, memang sudah terbiasa dengan teknologi, namun mereka masih memerlukan bimbingan untuk mengembangkan literasi digital yang baik.
+
+Penelitian menunjukkan bahwa meskipun generasi muda mahir menggunakan media sosial dan aplikasi digital, mereka seringkali kesulitan dalam membedakan informasi yang valid dan hoaks. Kemampuan untuk memverifikasi sumber informasi, memahami bias dalam konten digital, dan menggunakan teknologi untuk tujuan produktif masih perlu ditingkatkan. Oleh karena itu, pendidikan literasi digital harus menjadi bagian integral dari kurikulum pendidikan formal.
+
+Sekolah-sekolah di Indonesia mulai mengintegrasikan literasi digital dalam pembelajaran. Program ini tidak hanya mengajarkan cara menggunakan perangkat teknologi, tetapi juga mengembangkan kemampuan berpikir kritis terhadap informasi digital. Siswa diajarkan untuk selalu memverifikasi informasi sebelum membagikannya, memahami etika digital, dan menggunakan teknologi untuk mendukung pembelajaran mereka.`,
+                question: 'Berdasarkan teks tersebut, apa yang dimaksud dengan literasi digital?',
+                options: [
+                    'Kemampuan menggunakan teknologi canggih',
+                    'Kemampuan memahami, mengevaluasi, dan menggunakan informasi digital secara kritis',
+                    'Kemampuan membuat konten digital yang menarik',
+                    'Kemampuan mengoperasikan semua jenis perangkat elektronik',
+                    'Kemampuan mengakses internet dengan cepat'
+                ],
+                correct: 1,
+                explanation: 'Literasi digital menurut teks adalah kemampuan untuk memahami, mengevaluasi, dan menggunakan informasi digital secara kritis dan bertanggung jawab, bukan hanya sekedar menggunakan teknologi.'
+            },
+            {
+                type: 'multiple-choice',
+                passage: `Perubahan iklim telah menjadi isu global yang mempengaruhi berbagai aspek kehidupan manusia. Di Indonesia, dampak perubahan iklim sangat terasa, terutama dalam sektor pertanian. Petani menghadapi tantangan berupa perubahan pola curah hujan, peningkatan suhu, dan munculnya hama serta penyakit tanaman yang baru. Kondisi ini mengancam ketahanan pangan nasional dan kesejahteraan petani.
+
+Untuk menghadapi tantangan ini, pemerintah Indonesia telah mengembangkan berbagai strategi adaptasi dan mitigasi. Program pertanian berkelanjutan diperkenalkan untuk membantu petani beradaptasi dengan perubahan iklim. Program ini mencakup penggunaan varietas tanaman yang tahan terhadap perubahan cuaca, sistem irigasi yang efisien, dan teknik budidaya yang ramah lingkungan.
+
+Selain itu, pemerintah juga mendorong diversifikasi tanaman dan pengembangan teknologi pertanian modern. Penggunaan sensor untuk memantau kondisi tanah dan cuaca, sistem peringatan dini untuk hama dan penyakit, serta aplikasi mobile untuk memberikan informasi pertanian kepada petani menjadi bagian dari upaya modernisasi sektor pertanian. Kolaborasi antara pemerintah, peneliti, dan petani sangat penting untuk keberhasilan program ini.`,
+                question: 'Strategi utama yang dikembangkan pemerintah untuk menghadapi dampak perubahan iklim di sektor pertanian adalah...',
+                options: [
+                    'Mengurangi luas lahan pertanian',
+                    'Mengimpor semua kebutuhan pangan',
+                    'Mengembangkan pertanian berkelanjutan dan teknologi modern',
+                    'Memindahkan semua petani ke kota',
+                    'Menghentikan aktivitas pertanian tradisional'
+                ],
+                correct: 2,
+                explanation: 'Berdasarkan teks, pemerintah mengembangkan strategi pertanian berkelanjutan dan teknologi modern untuk membantu petani beradaptasi dengan perubahan iklim.'
+            },
+            {
+                type: 'multiple-choice',
+                passage: `Seni tradisional Indonesia memiliki kekayaan yang luar biasa dan mencerminkan keberagaman budaya nusantara. Setiap daerah memiliki keunikan seni tradisional yang telah diwariskan turun-temurun. Namun, di era globalisasi ini, seni tradisional menghadapi tantangan besar dalam mempertahankan eksistensinya. Generasi muda cenderung lebih tertarik pada budaya populer dari luar negeri dibandingkan dengan seni tradisional lokal.
+
+Upaya pelestarian seni tradisional memerlukan pendekatan yang komprehensif dan inovatif. Pemerintah, seniman, dan masyarakat harus bekerja sama untuk memastikan seni tradisional tetap hidup dan berkembang. Salah satu cara yang efektif adalah dengan mengintegrasikan seni tradisional ke dalam pendidikan formal. Sekolah-sekolah dapat memasukkan pembelajaran seni tradisional dalam kurikulum, sehingga siswa dapat mengenal dan menghargai warisan budaya mereka.
+
+Selain itu, pemanfaatan teknologi digital juga dapat membantu mempromosikan seni tradisional. Media sosial, platform streaming, dan aplikasi mobile dapat digunakan untuk memperkenalkan seni tradisional kepada audiens yang lebih luas, terutama generasi muda. Dokumentasi digital juga penting untuk melestarikan teknik dan pengetahuan seni tradisional agar tidak hilang ditelan waktu.`,
+                question: 'Tantangan utama yang dihadapi seni tradisional Indonesia di era globalisasi adalah...',
+                options: [
+                    'Kurangnya bahan baku untuk berkarya',
+                    'Generasi muda lebih tertarik budaya populer luar negeri',
+                    'Tidak ada tempat untuk pertunjukan seni',
+                    'Seniman tradisional sudah punah',
+                    'Pemerintah melarang seni tradisional'
+                ],
+                correct: 1,
+                explanation: 'Teks menyebutkan bahwa generasi muda cenderung lebih tertarik pada budaya populer dari luar negeri dibandingkan dengan seni tradisional lokal.'
+            },
+            {
+                type: 'multiple-choice',
+                passage: `Ekonomi kreatif telah menjadi salah satu sektor yang berkembang pesat di Indonesia. Sektor ini mencakup berbagai bidang seperti fashion, kuliner, kerajinan, musik, film, dan teknologi digital. Kontribusi ekonomi kreatif terhadap Produk Domestik Bruto (PDB) Indonesia terus meningkat dari tahun ke tahun. Pada tahun 2019, sektor ekonomi kreatif menyumbang sekitar 7,44% dari total PDB nasional dan menyerap lebih dari 17 juta tenaga kerja.
+
+Perkembangan ekonomi kreatif didukung oleh beberapa faktor, antara lain kemajuan teknologi digital, meningkatnya akses internet, dan tumbuhnya platform e-commerce. Teknologi digital memungkinkan pelaku ekonomi kreatif untuk memasarkan produk mereka secara online, menjangkau konsumen yang lebih luas, dan mengurangi biaya operasional. Platform media sosial juga berperan penting dalam mempromosikan produk kreatif dan membangun brand awareness.
+
+Pemerintah Indonesia sangat mendukung pengembangan ekonomi kreatif melalui berbagai program dan kebijakan. Program inkubator bisnis, pelatihan kewirausahaan, dan pemberian akses pembiayaan kepada pelaku ekonomi kreatif menjadi prioritas pemerintah. Selain itu, pemerintah juga berupaya menciptakan ekosistem yang kondusif bagi pertumbuhan ekonomi kreatif dengan membangun infrastruktur digital dan memperkuat perlindungan hak kekayaan intelektual.`,
+                question: 'Faktor utama yang mendukung perkembangan ekonomi kreatif di Indonesia adalah...',
+                options: [
+                    'Menurunnya minat masyarakat terhadap produk impor',
+                    'Kemajuan teknologi digital dan meningkatnya akses internet',
+                    'Berkurangnya kompetisi dari negara lain',
+                    'Turunnya harga bahan baku produksi',
+                    'Meningkatnya jumlah investor asing'
+                ],
+                correct: 1,
+                explanation: 'Teks menyebutkan bahwa kemajuan teknologi digital, meningkatnya akses internet, dan tumbuhnya platform e-commerce adalah faktor-faktor yang mendukung perkembangan ekonomi kreatif.'
+            },
+            {
+                type: 'multiple-choice',
+                passage: `Pendidikan karakter merupakan aspek penting dalam pembentukan generasi muda yang berkualitas. Pendidikan karakter tidak hanya mengajarkan nilai-nilai moral, tetapi juga membentuk sikap, perilaku, dan kepribadian siswa. Di era digital ini, tantangan dalam pendidikan karakter semakin kompleks karena siswa terpapar berbagai informasi dan pengaruh dari media digital yang tidak selalu positif.
+
+Implementasi pendidikan karakter di sekolah memerlukan pendekatan yang holistik dan terintegrasi. Pendidikan karakter tidak dapat diajarkan hanya melalui mata pelajaran tertentu, tetapi harus diintegrasikan dalam seluruh aspek kehidupan sekolah. Guru berperan sebagai model dan fasilitator dalam pembentukan karakter siswa. Mereka harus menunjukkan contoh perilaku yang baik dan menciptakan lingkungan belajar yang kondusif untuk pengembangan karakter.
+
+Selain peran sekolah, keluarga dan masyarakat juga memiliki tanggung jawab besar dalam pendidikan karakter. Sinergi antara sekolah, keluarga, dan masyarakat sangat penting untuk menciptakan lingkungan yang mendukung pembentukan karakter positif. Program-program seperti parenting education, keterlibatan orang tua dalam kegiatan sekolah, dan kemitraan dengan organisasi masyarakat dapat memperkuat implementasi pendidikan karakter.`,
+                question: 'Pendekatan yang diperlukan dalam implementasi pendidikan karakter di sekolah adalah...',
+                options: [
+                    'Mengajarkan melalui mata pelajaran agama saja',
+                    'Holistik dan terintegrasi dalam seluruh aspek kehidupan sekolah',
+                    'Fokus pada pembelajaran di kelas saja',
+                    'Menyerahkan sepenuhnya kepada guru BK',
+                    'Menggunakan metode ceramah tradisional'
+                ],
+                correct: 1,
+                explanation: 'Teks menyatakan bahwa implementasi pendidikan karakter memerlukan pendekatan yang holistik dan terintegrasi, tidak hanya melalui mata pelajaran tertentu tetapi dalam seluruh aspek kehidupan sekolah.'
+            },
+            {
+                type: 'multiple-choice',
+                passage: `Kearifan lokal merupakan warisan budaya yang sangat berharga bagi masyarakat Indonesia. Kearifan lokal mencakup pengetahuan, nilai, norma, dan praktik tradisional yang telah terbukti efektif dalam mengelola kehidupan masyarakat dan lingkungan. Dalam konteks pembangunan berkelanjutan, kearifan lokal memiliki peran yang sangat penting karena mengandung prinsip-prinsip yang sejalan dengan konsep sustainability.
+
+Salah satu contoh kearifan lokal yang masih bertahan adalah sistem subak di Bali. Subak adalah sistem irigasi tradisional yang tidak hanya mengatur pembagian air untuk pertanian, tetapi juga mencakup aspek sosial, budaya, dan spiritual. Sistem ini telah terbukti mampu menjaga keseimbangan ekosistem sawah dan menciptakan harmoni dalam masyarakat petani. UNESCO bahkan telah mengakui subak sebagai Warisan Budaya Dunia.
+
+Namun, modernisasi dan globalisasi mengancam kelestarian kearifan lokal. Banyak generasi muda yang tidak lagi mengenal atau menghargai kearifan lokal karena terpengaruh oleh gaya hidup modern. Oleh karena itu, diperlukan upaya serius untuk mendokumentasikan, melestarikan, dan merevitalisasi kearifan lokal. Pendidikan formal dan non-formal dapat berperan dalam memperkenalkan kearifan lokal kepada generasi muda.`,
+                question: 'Mengapa sistem subak di Bali dianggap sebagai contoh kearifan lokal yang penting?',
+                options: [
+                    'Karena hanya mengatur pembagian air',
+                    'Karena mencakup aspek sosial, budaya, spiritual dan menjaga keseimbangan ekosistem',
+                    'Karena merupakan teknologi modern',
+                    'Karena mudah diterapkan di daerah lain',
+                    'Karena menghasilkan keuntungan ekonomi besar'
+                ],
+                correct: 1,
+                explanation: 'Teks menjelaskan bahwa subak tidak hanya mengatur pembagian air, tetapi juga mencakup aspek sosial, budaya, dan spiritual, serta terbukti mampu menjaga keseimbangan ekosistem sawah.'
+            },
+            {
+                type: 'multiple-choice',
+                passage: `Revolusi industri 4.0 telah mengubah lanskap dunia kerja secara fundamental. Teknologi seperti artificial intelligence (AI), Internet of Things (IoT), big data, dan robotika mengotomatisasi banyak pekerjaan yang sebelumnya dilakukan oleh manusia. Perubahan ini menciptakan tantangan sekaligus peluang bagi tenaga kerja Indonesia. Di satu sisi, beberapa jenis pekerjaan menjadi obsolete, namun di sisi lain, muncul jenis pekerjaan baru yang membutuhkan keterampilan digital.
+
+Untuk menghadapi era industri 4.0, tenaga kerja Indonesia perlu melakukan reskilling dan upskilling. Reskilling adalah proses mempelajari keterampilan baru untuk beralih ke pekerjaan yang berbeda, sedangkan upskilling adalah peningkatan keterampilan dalam bidang pekerjaan yang sama. Pemerintah, dunia pendidikan, dan industri harus berkolaborasi untuk menyediakan program pelatihan yang relevan dengan kebutuhan industri 4.0.
+
+Sistem pendidikan juga perlu beradaptasi dengan perubahan ini. Kurikulum pendidikan harus diperbarui untuk memasukkan pembelajaran tentang teknologi digital, computational thinking, dan soft skills seperti kreativitas, critical thinking, dan collaboration. Selain itu, metode pembelajaran juga harus berubah dari teacher-centered menjadi student-centered, dengan memanfaatkan teknologi digital untuk menciptakan pengalaman belajar yang lebih interaktif dan personal.`,
+                question: 'Apa perbedaan antara reskilling dan upskilling dalam konteks industri 4.0?',
+                options: [
+                    'Reskilling untuk pekerja muda, upskilling untuk pekerja senior',
+                    'Reskilling mempelajari keterampilan baru untuk pekerjaan berbeda, upskilling meningkatkan keterampilan dalam bidang yang sama',
+                    'Reskilling lebih mudah daripada upskilling',
+                    'Reskilling untuk teknologi, upskilling untuk manajemen',
+                    'Tidak ada perbedaan antara keduanya'
+                ],
+                correct: 1,
+                explanation: 'Teks menjelaskan bahwa reskilling adalah proses mempelajari keterampilan baru untuk beralih ke pekerjaan yang berbeda, sedangkan upskilling adalah peningkatan keterampilan dalam bidang pekerjaan yang sama.'
+            },
+            {
+                type: 'multiple-choice',
+                passage: `Kesehatan mental remaja menjadi isu yang semakin mendapat perhatian di Indonesia. Berbagai faktor seperti tekanan akademik, masalah keluarga, bullying, dan pengaruh media sosial dapat mempengaruhi kesehatan mental remaja. Data menunjukkan bahwa prevalensi gangguan kesehatan mental pada remaja mengalami peningkatan, terutama kecemasan dan depresi. Kondisi ini memerlukan perhatian serius dari berbagai pihak.
+
+Sekolah memiliki peran penting dalam menjaga kesehatan mental siswa. Program bimbingan konseling yang efektif, lingkungan sekolah yang positif dan suportif, serta deteksi dini masalah kesehatan mental dapat membantu siswa mengatasi berbagai tantangan yang mereka hadapi. Guru dan konselor sekolah perlu dibekali dengan pengetahuan dan keterampilan untuk mengidentifikasi tanda-tanda gangguan kesehatan mental pada siswa.
+
+Selain peran sekolah, keluarga juga memiliki tanggung jawab besar dalam menjaga kesehatan mental remaja. Komunikasi yang terbuka antara orang tua dan anak, dukungan emosional, dan pemahaman terhadap tahap perkembangan remaja sangat penting. Orang tua perlu menghindari tekanan berlebihan terhadap anak dan menciptakan lingkungan keluarga yang harmonis dan mendukung perkembangan positif remaja.`,
+                question: 'Faktor-faktor yang dapat mempengaruhi kesehatan mental remaja menurut teks adalah...',
+                options: [
+                    'Hanya masalah keluarga',
+                    'Tekanan akademik, masalah keluarga, bullying, dan pengaruh media sosial',
+                    'Hanya pengaruh media sosial',
+                    'Hanya tekanan dari teman sebaya',
+                    'Hanya faktor genetik'
+                ],
+                correct: 1,
+                explanation: 'Teks menyebutkan bahwa berbagai faktor seperti tekanan akademik, masalah keluarga, bullying, dan pengaruh media sosial dapat mempengaruhi kesehatan mental remaja.'
+            },
+            {
+                type: 'multiple-choice',
+                passage: `Pariwisata berkelanjutan menjadi konsep yang semakin penting dalam pengembangan sektor pariwisata Indonesia. Konsep ini menekankan pada pengembangan pariwisata yang tidak hanya memberikan manfaat ekonomi, tetapi juga menjaga kelestarian lingkungan dan budaya lokal. Indonesia dengan kekayaan alam dan budayanya memiliki potensi besar untuk mengembangkan pariwisata berkelanjutan.
+
+Implementasi pariwisata berkelanjutan memerlukan keterlibatan semua stakeholder, mulai dari pemerintah, pelaku industri pariwisata, masyarakat lokal, hingga wisatawan. Pemerintah berperan dalam membuat regulasi dan kebijakan yang mendukung pariwisata berkelanjutan. Pelaku industri pariwisata harus menerapkan praktik bisnis yang ramah lingkungan dan menghormati budaya lokal. Masyarakat lokal perlu dilibatkan dalam pengembangan pariwisata agar mereka dapat merasakan manfaat ekonomi sekaligus menjadi guardian bagi kelestarian lingkungan dan budaya.
+
+Wisatawan juga memiliki peran penting dalam pariwisata berkelanjutan. Mereka perlu memiliki kesadaran untuk berwisata secara bertanggung jawab, menghormati lingkungan dan budaya lokal, serta memilih produk dan layanan pariwisata yang menerapkan prinsip sustainability. Edukasi kepada wisatawan tentang pariwisata berkelanjutan sangat penting untuk menciptakan kesadaran kolektif.`,
+                question: 'Siapa saja stakeholder yang terlibat dalam implementasi pariwisata berkelanjutan?',
+                options: [
+                    'Hanya pemerintah dan pelaku industri',
+                    'Pemerintah, pelaku industri, masyarakat lokal, dan wisatawan',
+                    'Hanya masyarakat lokal',
+                    'Hanya wisatawan asing',
+                    'Hanya organisasi internasional'
+                ],
+                correct: 1,
+                explanation: 'Teks menyebutkan bahwa implementasi pariwisata berkelanjutan memerlukan keterlibatan semua stakeholder: pemerintah, pelaku industri pariwisata, masyarakat lokal, hingga wisatawan.'
+            },
+            {
+                type: 'multiple-choice',
+                passage: `Teknologi blockchain mulai mendapat perhatian di Indonesia sebagai teknologi yang dapat mengubah berbagai sektor, mulai dari keuangan, supply chain, hingga pemerintahan. Blockchain adalah teknologi distributed ledger yang memungkinkan penyimpanan data secara terdesentralisasi dan aman. Setiap transaksi yang tercatat dalam blockchain bersifat immutable (tidak dapat diubah) dan transparent, sehingga dapat meningkatkan kepercayaan dan mengurangi risiko fraud.
+
+Di sektor keuangan, blockchain dapat digunakan untuk mengembangkan sistem pembayaran digital yang lebih efisien dan aman. Bank Indonesia telah mulai mengeksplorasi penggunaan blockchain untuk Central Bank Digital Currency (CBDC). Di sektor supply chain, blockchain dapat meningkatkan traceability produk, sehingga konsumen dapat mengetahui asal-usul dan kualitas produk yang mereka beli. Hal ini sangat penting untuk produk-produk seperti makanan dan obat-obatan.
+
+Namun, implementasi blockchain di Indonesia masih menghadapi berbagai tantangan. Kurangnya pemahaman tentang teknologi blockchain, regulasi yang belum jelas, dan keterbatasan infrastruktur teknologi menjadi hambatan utama. Pemerintah perlu membuat regulasi yang jelas dan mendukung pengembangan blockchain, sementara industri perlu meningkatkan literasi blockchain dan berinvestasi dalam infrastruktur teknologi yang memadai.`,
+                question: 'Apa keunggulan utama teknologi blockchain menurut teks?',
+                options: [
+                    'Murah dan mudah digunakan',
+                    'Bersifat immutable dan transparent sehingga meningkatkan kepercayaan',
+                    'Dapat digunakan tanpa internet',
+                    'Tidak memerlukan listrik',
+                    'Hanya dapat digunakan untuk cryptocurrency'
+                ],
+                correct: 1,
+                explanation: 'Teks menyebutkan bahwa setiap transaksi dalam blockchain bersifat immutable (tidak dapat diubah) dan transparent, sehingga dapat meningkatkan kepercayaan dan mengurangi risiko fraud.'
+            },
+
+            // Pilihan Ganda Kompleks (5 soal)
+            {
+                type: 'multiple-complex',
+                passage: `Media sosial telah mengubah cara manusia berkomunikasi dan berinteraksi. Platform seperti Facebook, Instagram, Twitter, dan TikTok tidak hanya menjadi sarana hiburan, tetapi juga alat untuk berbisnis, belajar, dan berorganisasi. Namun, penggunaan media sosial juga membawa dampak negatif seperti penyebaran hoaks, cyberbullying, dan kecanduan digital.
+
+Penelitian menunjukkan bahwa penggunaan media sosial yang berlebihan dapat mempengaruhi kesehatan mental, terutama pada remaja. Fenomena FOMO (Fear of Missing Out) dan perbandingan sosial yang tidak sehat sering terjadi di media sosial. Selain itu, algoritma media sosial yang dirancang untuk mempertahankan perhatian pengguna dapat menciptakan echo chamber dan filter bubble yang membatasi perspektif pengguna.
+
+Untuk menggunakan media sosial secara sehat, diperlukan literasi digital yang baik. Pengguna perlu memahami cara kerja algoritma, dapat membedakan informasi yang valid dan hoaks, serta mampu mengatur waktu penggunaan media sosial. Pendidikan tentang etika digital dan critical thinking juga penting untuk menciptakan lingkungan digital yang positif.`,
+                question: 'Pernyataan yang benar tentang dampak media sosial adalah...',
+                options: [
+                    'Media sosial hanya memberikan dampak positif',
+                    'Penggunaan berlebihan dapat mempengaruhi kesehatan mental remaja',
+                    'Algoritma media sosial dapat menciptakan echo chamber',
+                    'Media sosial tidak dapat digunakan untuk berbisnis',
+                    'FOMO adalah dampak positif dari media sosial'
+                ],
+                correct: [1, 2],
+                explanation: 'Pernyataan yang benar adalah bahwa penggunaan media sosial berlebihan dapat mempengaruhi kesehatan mental remaja dan algoritma media sosial dapat menciptakan echo chamber yang membatasi perspektif pengguna.'
+            },
+            {
+                type: 'multiple-complex',
+                passage: `Energi terbarukan menjadi solusi penting untuk mengatasi krisis energi dan perubahan iklim. Indonesia memiliki potensi energi terbarukan yang sangat besar, meliputi energi surya, angin, air, panas bumi, dan biomassa. Pemerintah menargetkan bauran energi terbarukan mencapai 23% pada tahun 2025 dan 31% pada tahun 2050.
+
+Pengembangan energi terbarukan memberikan berbagai manfaat, antara lain mengurangi emisi gas rumah kaca, menciptakan lapangan kerja baru, meningkatkan kemandirian energi, dan mengurangi ketergantungan pada bahan bakar fosil. Namun, pengembangan energi terbarukan juga menghadapi tantangan seperti biaya investasi yang tinggi, keterbatasan teknologi, dan resistensi dari industri energi konvensional.
+
+Untuk mempercepat transisi energi, diperlukan dukungan kebijakan yang kuat, investasi dalam penelitian dan pengembangan, serta kolaborasi antara pemerintah, swasta, dan masyarakat. Insentif fiskal, kemudahan perizinan, dan pengembangan infrastruktur pendukung juga diperlukan untuk menarik investasi di sektor energi terbarukan.`,
+                question: 'Manfaat pengembangan energi terbarukan meliputi...',
+                options: [
+                    'Mengurangi emisi gas rumah kaca',
+                    'Meningkatkan ketergantungan pada bahan bakar fosil',
+                    'Menciptakan lapangan kerja baru',
+                    'Meningkatkan kemandirian energi',
+                    'Mengurangi kualitas udara'
+                ],
+                correct: [0, 2, 3],
+                explanation: 'Manfaat energi terbarukan menurut teks adalah mengurangi emisi gas rumah kaca, menciptakan lapangan kerja baru, dan meningkatkan kemandirian energi.'
+            },
+            {
+                type: 'multiple-complex',
+                passage: `Urbanisasi adalah proses perpindahan penduduk dari daerah pedesaan ke perkotaan. Di Indonesia, laju urbanisasi terus meningkat seiring dengan pembangunan ekonomi dan industrialisasi. Kota-kota besar seperti Jakarta, Surabaya, dan Medan menjadi magnet bagi penduduk desa yang mencari peluang ekonomi yang lebih baik.
+
+Urbanisasi membawa dampak positif seperti peningkatan produktivitas ekonomi, inovasi, dan akses terhadap layanan publik. Konsentrasi penduduk di kota memungkinkan efisiensi dalam penyediaan infrastruktur dan layanan. Namun, urbanisasi yang tidak terkendali juga menimbulkan masalah seperti kemacetan, polusi, kekurangan perumahan, dan kesenjangan sosial.
+
+Untuk mengelola urbanisasi secara berkelanjutan, diperlukan perencanaan kota yang baik, pengembangan infrastruktur yang memadai, dan pemerataan pembangunan antara kota dan desa. Konsep smart city dan green city dapat diterapkan untuk menciptakan kota yang livable dan sustainable.`,
+                question: 'Dampak negatif urbanisasi yang tidak terkendali adalah...',
+                options: [
+                    'Peningkatan produktivitas ekonomi',
+                    'Kemacetan lalu lintas',
+                    'Polusi lingkungan',
+                    'Akses layanan publik yang lebih baik',
+                    'Kekurangan perumahan'
+                ],
+                correct: [1, 2, 4],
+                explanation: 'Dampak negatif urbanisasi yang tidak terkendali menurut teks adalah kemacetan, polusi, dan kekurangan perumahan.'
+            },
+            {
+                type: 'multiple-complex',
+                passage: `Kewirausahaan sosial (social entrepreneurship) adalah pendekatan bisnis yang bertujuan menyelesaikan masalah sosial sambil menciptakan nilai ekonomi. Berbeda dengan bisnis konvensional yang fokus pada profit, kewirausahaan sosial mengutamakan dampak sosial positif. Di Indonesia, kewirausahaan sosial berkembang pesat dengan munculnya berbagai startup dan organisasi yang mengatasi masalah pendidikan, kesehatan, lingkungan, dan kemiskinan.
+
+Karakteristik kewirausahaan sosial meliputi inovasi dalam menyelesaikan masalah sosial, keberlanjutan finansial, dan dampak sosial yang terukur. Para social entrepreneur menggunakan pendekatan bisnis untuk menciptakan solusi yang scalable dan sustainable. Mereka juga melibatkan komunitas dalam pengembangan solusi dan memastikan bahwa manfaat dapat dirasakan oleh target beneficiary.
+
+Pemerintah dan investor mulai memberikan dukungan kepada kewirausahaan sosial melalui program inkubasi, hibah, dan investasi dampak (impact investment). Ekosistem kewirausahaan sosial di Indonesia semakin menguat dengan adanya komunitas, kompetisi, dan platform yang mendukung pengembangan social enterprise.`,
+                question: 'Karakteristik kewirausahaan sosial mencakup...',
+                options: [
+                    'Fokus utama pada keuntungan maksimal',
+                    'Inovasi dalam menyelesaikan masalah sosial',
+                    'Keberlanjutan finansial',
+                    'Dampak sosial yang terukur',
+                    'Tidak melibatkan komunitas'
+                ],
+                correct: [1, 2, 3],
+                explanation: 'Karakteristik kewirausahaan sosial menurut teks adalah inovasi dalam menyelesaikan masalah sosial, keberlanjutan finansial, dan dampak sosial yang terukur.'
+            },
+            {
+                type: 'multiple-complex',
+                passage: `Artificial Intelligence (AI) atau kecerdasan buatan telah menjadi teknologi yang mengubah berbagai aspek kehidupan manusia. AI dapat didefinisikan sebagai kemampuan mesin untuk meniru kecerdasan manusia dalam melakukan tugas-tugas seperti pembelajaran, penalaran, dan pengambilan keputusan. Aplikasi AI dapat ditemukan dalam berbagai bidang seperti kesehatan, pendidikan, transportasi, dan hiburan.
+
+Dalam bidang kesehatan, AI digunakan untuk diagnosis penyakit, pengembangan obat, dan personalisasi pengobatan. Di bidang pendidikan, AI memungkinkan pembelajaran yang adaptif dan personal. Dalam transportasi, AI mendukung pengembangan kendaraan otonom. Namun, perkembangan AI juga menimbulkan kekhawatiran tentang penggantian pekerjaan manusia, privasi data, dan bias algoritma.
+
+Untuk memaksimalkan manfaat AI sambil meminimalkan risikonya, diperlukan regulasi yang tepat, pengembangan AI yang etis, dan peningkatan literasi AI di masyarakat. Kolaborasi antara pemerintah, industri, akademisi, dan masyarakat sipil sangat penting untuk memastikan AI berkembang untuk kebaikan bersama.`,
+                question: 'Aplikasi AI dapat ditemukan dalam bidang...',
+                options: [
+                    'Kesehatan untuk diagnosis penyakit',
+                    'Pendidikan untuk pembelajaran adaptif',
+                    'Transportasi untuk kendaraan otonom',
+                    'Pertanian tradisional tanpa teknologi',
+                    'Hiburan'
+                ],
+                correct: [0, 1, 2, 4],
+                explanation: 'Teks menyebutkan bahwa aplikasi AI dapat ditemukan dalam kesehatan, pendidikan, transportasi, dan hiburan.'
+            },
+
+            // Benar Salah (5 soal)
+            {
+                type: 'true-false',
+                passage: `Globalisasi telah mengubah lanskap ekonomi dunia secara fundamental. Proses ini ditandai dengan meningkatnya integrasi ekonomi antar negara melalui perdagangan, investasi, dan aliran modal. Indonesia sebagai negara berkembang merasakan dampak signifikan dari globalisasi, baik positif maupun negatif.
+
+Dampak positif globalisasi bagi Indonesia antara lain meningkatnya akses terhadap pasar internasional, transfer teknologi, dan masuknya investasi asing. Hal ini mendorong pertumbuhan ekonomi dan menciptakan lapangan kerja. Namun, globalisasi juga membawa tantangan seperti persaingan yang ketat, ketergantungan pada ekonomi global, dan risiko krisis ekonomi yang dapat menyebar dengan cepat.
+
+Untuk mengoptimalkan manfaat globalisasi, Indonesia perlu meningkatkan daya saing ekonomi melalui peningkatan kualitas sumber daya manusia, pengembangan infrastruktur, dan penguatan institusi. Selain itu, diversifikasi ekonomi dan penguatan ekonomi domestik juga penting untuk mengurangi ketergantungan pada pasar global.`,
+                statements: [
+                    'Globalisasi hanya memberikan dampak positif bagi Indonesia',
+                    'Transfer teknologi merupakan salah satu dampak positif globalisasi',
+                    'Globalisasi dapat meningkatkan risiko penyebaran krisis ekonomi',
+                    'Indonesia tidak perlu meningkatkan daya saing untuk menghadapi globalisasi',
+                    'Diversifikasi ekonomi penting untuk mengurangi ketergantungan pada pasar global'
+                ],
+                correct: [false, true, true, false, true],
+                explanation: [
+                    'Salah. Teks menyebutkan globalisasi membawa dampak positif dan negatif.',
+                    'Benar. Transfer teknologi disebutkan sebagai dampak positif globalisasi.',
+                    'Benar. Teks menyebutkan risiko krisis ekonomi dapat menyebar dengan cepat.',
+                    'Salah. Indonesia perlu meningkatkan daya saing untuk mengoptimalkan manfaat globalisasi.',
+                    'Benar. Diversifikasi ekonomi penting untuk mengurangi ketergantungan pada pasar global.'
+                ]
+            },
+            {
+                type: 'true-false',
+                passage: `Revolusi digital telah mengubah cara manusia bekerja, belajar, dan berinteraksi. Teknologi digital seperti internet, smartphone, dan cloud computing telah menjadi bagian integral dari kehidupan sehari-hari. Transformasi digital tidak hanya terjadi di sektor teknologi, tetapi juga merambah ke berbagai sektor seperti pendidikan, kesehatan, keuangan, dan pemerintahan.
+
+Dalam sektor pendidikan, teknologi digital memungkinkan pembelajaran jarak jauh, akses terhadap sumber belajar yang tak terbatas, dan personalisasi pembelajaran. Pandemi COVID-19 mempercepat adopsi teknologi digital dalam pendidikan. Di sektor kesehatan, telemedicine dan electronic health record meningkatkan aksesibilitas dan kualitas layanan kesehatan.
+
+Namun, revolusi digital juga menciptakan kesenjangan digital (digital divide) antara mereka yang memiliki akses teknologi dan yang tidak. Hal ini dapat memperlebar kesenjangan sosial dan ekonomi. Oleh karena itu, penting untuk memastikan akses teknologi yang merata dan meningkatkan literasi digital di seluruh lapisan masyarakat.`,
+                statements: [
+                    'Revolusi digital hanya mempengaruhi sektor teknologi',
+                    'Pandemi COVID-19 mempercepat adopsi teknologi digital dalam pendidikan',
+                    'Telemedicine meningkatkan aksesibilitas layanan kesehatan',
+                    'Revolusi digital tidak menciptakan kesenjangan dalam masyarakat',
+                    'Literasi digital penting untuk seluruh lapisan masyarakat'
+                ],
+                correct: [false, true, true, false, true],
+                explanation: [
+                    'Salah. Transformasi digital merambah ke berbagai sektor, tidak hanya teknologi.',
+                    'Benar. Teks menyebutkan pandemi COVID-19 mempercepat adopsi teknologi digital dalam pendidikan.',
+                    'Benar. Telemedicine disebutkan meningkatkan aksesibilitas layanan kesehatan.',
+                    'Salah. Revolusi digital menciptakan kesenjangan digital yang dapat memperlebar kesenjangan sosial.',
+                    'Benar. Teks menekankan pentingnya meningkatkan literasi digital di seluruh lapisan masyarakat.'
+                ]
+            },
+            {
+                type: 'true-false',
+                passage: `Perubahan iklim merupakan salah satu tantangan terbesar yang dihadapi umat manusia di abad ke-21. Peningkatan suhu global, perubahan pola cuaca, dan naiknya permukaan air laut adalah beberapa manifestasi dari perubahan iklim. Indonesia sebagai negara kepulauan sangat rentan terhadap dampak perubahan iklim.
+
+Dampak perubahan iklim di Indonesia meliputi peningkatan frekuensi bencana alam, ancaman terhadap ketahanan pangan, dan risiko tenggelamnya pulau-pulau kecil. Sektor pertanian, perikanan, dan pariwisata merupakan sektor yang paling terdampak. Selain itu, perubahan iklim juga mempengaruhi kesehatan masyarakat melalui penyebaran penyakit dan kualitas udara yang memburuk.
+
+Untuk mengatasi perubahan iklim, Indonesia berkomitmen untuk mengurangi emisi gas rumah kaca dan meningkatkan adaptasi terhadap dampak perubahan iklim. Program seperti moratorium hutan, pengembangan energi terbarukan, dan rehabilitasi ekosistem menjadi bagian dari upaya mitigasi dan adaptasi perubahan iklim.`,
+                statements: [
+                    'Indonesia tidak rentan terhadap dampak perubahan iklim',
+                    'Perubahan iklim dapat meningkatkan frekuensi bencana alam',
+                    'Sektor pertanian tidak terdampak oleh perubahan iklim',
+                    'Perubahan iklim dapat mempengaruhi kesehatan masyarakat',
+                    'Indonesia berkomitmen mengurangi emisi gas rumah kaca'
+                ],
+                correct: [false, true, false, true, true],
+                explanation: [
+                    'Salah. Indonesia sebagai negara kepulauan sangat rentan terhadap dampak perubahan iklim.',
+                    'Benar. Teks menyebutkan peningkatan frekuensi bencana alam sebagai dampak perubahan iklim.',
+                    'Salah. Sektor pertanian disebutkan sebagai salah satu sektor yang paling terdampak.',
+                    'Benar. Perubahan iklim mempengaruhi kesehatan melalui penyebaran penyakit dan kualitas udara.',
+                    'Benar. Indonesia berkomitmen untuk mengurangi emisi gas rumah kaca.'
+                ]
+            },
+            {
+                type: 'true-false',
+                passage: `Industri kreatif telah menjadi salah satu sektor ekonomi yang berkembang pesat di Indonesia. Sektor ini mencakup berbagai subsektor seperti fashion, kuliner, musik, film, game, dan kerajinan. Kontribusi industri kreatif terhadap PDB Indonesia terus meningkat dan menyerap jutaan tenaga kerja.
+
+Perkembangan industri kreatif didukung oleh kreativitas dan inovasi masyarakat Indonesia, kekayaan budaya lokal, dan kemajuan teknologi digital. Platform digital memungkinkan pelaku industri kreatif untuk memasarkan produk mereka secara global dengan biaya yang relatif rendah. Selain itu, dukungan pemerintah melalui berbagai program dan kebijakan juga berperan penting dalam pengembangan sektor ini.
+
+Namun, industri kreatif juga menghadapi tantangan seperti kurangnya akses pembiayaan, lemahnya perlindungan hak kekayaan intelektual, dan terbatasnya infrastruktur pendukung. Untuk mengatasi tantangan ini, diperlukan kolaborasi antara pemerintah, swasta, dan pelaku industri kreatif dalam menciptakan ekosistem yang kondusif.`,
+                statements: [
+                    'Industri kreatif tidak berkontribusi signifikan terhadap PDB Indonesia',
+                    'Platform digital membantu pelaku industri kreatif memasarkan produk secara global',
+                    'Industri kreatif tidak menghadapi tantangan dalam pengembangannya',
+                    'Perlindungan hak kekayaan intelektual masih lemah di industri kreatif',
+                    'Kolaborasi berbagai pihak diperlukan untuk mengembangkan industri kreatif'
+                ],
+                correct: [false, true, false, true, true],
+                explanation: [
+                    'Salah. Kontribusi industri kreatif terhadap PDB Indonesia terus meningkat.',
+                    'Benar. Platform digital memungkinkan pemasaran global dengan biaya relatif rendah.',
+                    'Salah. Industri kreatif menghadapi berbagai tantangan seperti akses pembiayaan dan perlindungan HKI.',
+                    'Benar. Lemahnya perlindungan hak kekayaan intelektual disebutkan sebagai tantangan.',
+                    'Benar. Diperlukan kolaborasi antara pemerintah, swasta, dan pelaku industri.'
+                ]
+            },
+            {
+                type: 'true-false',
+                passage: `Sistem pendidikan Indonesia telah mengalami berbagai reformasi untuk meningkatkan kualitas dan relevansi pendidikan. Kurikulum 2013 dan Kurikulum Merdeka merupakan upaya untuk mengembangkan pendidikan yang berpusat pada siswa dan mengembangkan kompetensi abad ke-21. Pendekatan pembelajaran yang menekankan pada critical thinking, creativity, collaboration, dan communication menjadi fokus utama.
+
+Teknologi juga semakin diintegrasikan dalam proses pembelajaran. Penggunaan Learning Management System (LMS), aplikasi pembelajaran, dan konten digital memperkaya pengalaman belajar siswa. Selain itu, konsep blended learning yang menggabungkan pembelajaran tatap muka dan online semakin populer.
+
+Namun, implementasi reformasi pendidikan masih menghadapi berbagai tantangan seperti kesenjangan kualitas pendidikan antar daerah, keterbatasan infrastruktur teknologi, dan perlunya peningkatan kompetensi guru. Upaya berkelanjutan diperlukan untuk memastikan semua siswa mendapat akses pendidikan berkualitas.`,
+                statements: [
+                    'Kurikulum Merdeka tidak berfokus pada pengembangan kompetensi abad ke-21',
+                    'Teknologi semakin diintegrasikan dalam proses pembelajaran',
+                    'Blended learning menggabungkan pembelajaran tatap muka dan online',
+                    'Tidak ada kesenjangan kualitas pendidikan antar daerah di Indonesia',
+                    'Peningkatan kompetensi guru diperlukan dalam reformasi pendidikan'
+                ],
+                correct: [false, true, true, false, true],
+                explanation: [
+                    'Salah. Kurikulum Merdeka merupakan upaya mengembangkan kompetensi abad ke-21.',
+                    'Benar. Teknologi semakin diintegrasikan melalui LMS, aplikasi, dan konten digital.',
+                    'Benar. Blended learning menggabungkan pembelajaran tatap muka dan online.',
+                    'Salah. Kesenjangan kualitas pendidikan antar daerah masih menjadi tantangan.',
+                    'Benar. Peningkatan kompetensi guru disebutkan sebagai kebutuhan dalam reformasi.'
+                ]
+            },
+
+            // Menjodohkan (5 soal)
+            {
+                type: 'matching',
+                passage: `Sastra Indonesia memiliki perkembangan yang panjang dan kaya, dimulai dari sastra lama hingga sastra modern. Setiap periode memiliki karakteristik dan tokoh-tokoh penting yang memberikan kontribusi besar bagi perkembangan sastra Indonesia. Pemahaman tentang periodisasi sastra Indonesia penting untuk memahami evolusi pemikiran dan budaya bangsa Indonesia.
+
+Sastra lama atau sastra klasik berkembang sebelum masuknya pengaruh Barat dan ditandai dengan karya-karya seperti hikayat, babad, dan syair. Sastra Melayu klasik seperti Hikayat Hang Tuah dan Syair Abdul Muluk menjadi representasi periode ini. Kemudian, sastra modern mulai berkembang pada awal abad ke-20 dengan munculnya novel-novel seperti Sitti Nurbaya dan Salah Asuhan.
+
+Angkatan 45 merupakan periode penting dalam sastra Indonesia yang ditandai dengan semangat perjuangan kemerdekaan. Tokoh-tokoh seperti Chairil Anwar, Idrus, dan Pramoedya Ananta Toer menjadi pelopor angkatan ini. Selanjutnya, Angkatan 66 dan periode kontemporer terus mengembangkan sastra Indonesia dengan tema dan gaya yang lebih beragam.`,
+                question: 'Jodohkan periode sastra dengan karakteristik atau tokohnya:',
+                leftColumn: [
+                    'Sastra Lama',
+                    'Sastra Modern Awal',
+                    'Angkatan 45',
+                    'Chairil Anwar',
+                    'Hikayat Hang Tuah'
+                ],
+                rightColumn: [
+                    'Semangat perjuangan kemerdekaan',
+                    'Penyair Angkatan 45',
+                    'Novel Sitti Nurbaya dan Salah Asuhan',
+                    'Sastra Melayu klasik',
+                    'Hikayat, babad, dan syair'
+                ],
+                correct: [4, 2, 0, 1, 3],
+                explanation: 'Sastra Lama ditandai hikayat/babad/syair, Sastra Modern Awal dengan novel Sitti Nurbaya/Salah Asuhan, Angkatan 45 dengan semangat perjuangan, Chairil Anwar sebagai penyair Angkatan 45, dan Hikayat Hang Tuah sebagai sastra Melayu klasik.'
+            },
+            {
+                type: 'matching',
+                passage: `Teks eksposisi merupakan salah satu jenis teks yang bertujuan untuk menjelaskan, memaparkan, atau menguraikan suatu topik secara objektif dan sistematis. Struktur teks eksposisi terdiri dari beberapa bagian yang memiliki fungsi masing-masing dalam menyampaikan informasi kepada pembaca.
+
+Bagian pembuka atau tesis berisi pernyataan umum tentang topik yang akan dibahas. Bagian ini berfungsi untuk memperkenalkan topik dan memberikan gambaran awal kepada pembaca. Argumentasi merupakan bagian inti yang berisi penjelasan, alasan, atau bukti-bukti yang mendukung tesis. Bagian ini dapat terdiri dari beberapa paragraf yang masing-masing membahas aspek tertentu dari topik.
+
+Penegasan ulang atau kesimpulan merupakan bagian penutup yang berisi rangkuman atau penguatan terhadap tesis yang telah dipaparkan. Selain struktur, teks eksposisi juga memiliki ciri kebahasaan khusus seperti penggunaan kata-kata teknis, konjungsi kausal, dan kalimat efektif untuk menyampaikan informasi secara jelas dan objektif.`,
+                question: 'Jodohkan bagian struktur teks eksposisi dengan fungsinya:',
+                leftColumn: [
+                    'Tesis',
+                    'Argumentasi',
+                    'Penegasan Ulang',
+                    'Konjungsi Kausal',
+                    'Kata Teknis'
+                ],
+                rightColumn: [
+                    'Ciri kebahasaan untuk menunjukkan sebab-akibat',
+                    'Bagian inti berisi penjelasan dan bukti',
+                    'Pernyataan umum tentang topik',
+                    'Rangkuman atau penguatan tesis',
+                    'Ciri kebahasaan untuk istilah khusus'
+                ],
+                correct: [2, 1, 3, 0, 4],
+                explanation: 'Tesis adalah pernyataan umum, Argumentasi berisi penjelasan dan bukti, Penegasan Ulang merangkum/menguatkan tesis, Konjungsi Kausal menunjukkan sebab-akibat, dan Kata Teknis untuk istilah khusus.'
+            },
+            {
+                type: 'matching',
+                passage: `Majas atau gaya bahasa merupakan cara pengungkapan pikiran melalui bahasa secara khas yang memperlihatkan jiwa dan kepribadian penulis. Penggunaan majas dapat membuat karya sastra menjadi lebih hidup, menarik, dan bermakna. Terdapat berbagai jenis majas yang dikelompokkan berdasarkan cara pengungkapannya.
+
+Majas perbandingan membandingkan suatu hal dengan hal lain untuk memberikan gambaran yang lebih jelas atau menarik. Contohnya adalah metafora, simile, dan personifikasi. Majas pertentangan menggunakan kata-kata yang berlawanan makna untuk menciptakan efek tertentu, seperti ironi dan paradoks.
+
+Majas sindiran digunakan untuk menyampaikan kritik atau sindiran secara halus, seperti sarkasme dan sinisme. Majas penegasan berfungsi untuk memperkuat atau menekankan suatu pernyataan, contohnya adalah repetisi dan retorika. Pemahaman tentang berbagai jenis majas penting untuk mengapresiasi karya sastra dan meningkatkan kemampuan berbahasa.`,
+                question: 'Jodohkan jenis majas dengan contoh atau fungsinya:',
+                leftColumn: [
+                    'Metafora',
+                    'Ironi',
+                    'Sarkasme',
+                    'Repetisi',
+                    'Personifikasi'
+                ],
+                rightColumn: [
+                    'Majas sindiran yang kasar',
+                    'Majas perbandingan dengan memberikan sifat manusia pada benda',
+                    'Majas penegasan dengan pengulangan',
+                    'Majas perbandingan langsung tanpa kata pembanding',
+                    'Majas pertentangan dengan makna berlawanan'
+                ],
+                correct: [3, 4, 0, 2, 1],
+                explanation: 'Metafora adalah perbandingan langsung, Ironi adalah pertentangan makna, Sarkasme adalah sindiran kasar, Repetisi adalah penegasan dengan pengulangan, Personifikasi memberikan sifat manusia pada benda.'
+            },
+            {
+                type: 'matching',
+                passage: `Hikayat merupakan salah satu bentuk sastra lama Indonesia yang memiliki ciri-ciri khas. Hikayat biasanya menceritakan tentang kehidupan raja-raja, pahlawan, atau tokoh-tokoh penting dengan latar belakang istana. Cerita dalam hikayat sering mengandung unsur fantastis, magis, dan didaktis.
+
+Struktur hikayat umumnya terdiri dari orientasi yang memperkenalkan tokoh dan latar, komplikasi yang berisi konflik atau masalah, resolusi yang berisi penyelesaian masalah, dan koda yang berisi pesan moral. Bahasa yang digunakan dalam hikayat adalah bahasa Melayu klasik dengan gaya bercerita yang khas.
+
+Ciri-ciri hikayat antara lain bersifat anonim (tidak diketahui pengarangnya), menggunakan alur maju, tokoh utama memiliki kesaktian, dan mengandung nilai-nilai moral atau agama. Hikayat juga sering menggunakan kata-kata arkais dan ungkapan-ungkapan khas seperti "alkisah", "syahdan", dan "hatta". Contoh hikayat terkenal adalah Hikayat Hang Tuah, Hikayat Seri Rama, dan Hikayat Raja-Raja Pasai.`,
+                question: 'Jodohkan unsur hikayat dengan penjelasannya:',
+                leftColumn: [
+                    'Orientasi',
+                    'Komplikasi',
+                    'Resolusi',
+                    'Koda',
+                    'Kata Arkais'
+                ],
+                rightColumn: [
+                    'Kata-kata kuno seperti "alkisah" dan "syahdan"',
+                    'Bagian yang berisi pesan moral',
+                    'Bagian yang memperkenalkan tokoh dan latar',
+                    'Bagian yang berisi penyelesaian masalah',
+                    'Bagian yang berisi konflik atau masalah'
+                ],
+                correct: [2, 4, 3, 1, 0],
+                explanation: 'Orientasi memperkenalkan tokoh dan latar, Komplikasi berisi konflik, Resolusi berisi penyelesaian, Koda berisi pesan moral, dan Kata Arkais adalah kata-kata kuno khas hikayat.'
+            },
+            {
+                type: 'matching',
+                passage: `Puisi merupakan karya sastra yang menggunakan bahasa yang padat, berima, dan berirama untuk mengekspresikan perasaan, pikiran, atau pengalaman penyair. Unsur-unsur puisi meliputi unsur fisik dan unsur batin yang saling berkaitan untuk menciptakan keindahan dan makna.
+
+Unsur fisik puisi terdiri dari diksi (pilihan kata), imaji (gambaran angan), kata konkret, bahasa figuratif (majas), versifikasi (rima, ritma, metrum), dan tipografi. Diksi berkaitan dengan pemilihan kata yang tepat untuk menciptakan efek tertentu. Imaji membantu pembaca membayangkan apa yang digambarkan penyair.
+
+Unsur batin puisi meliputi tema (pokok persoalan), feeling (perasaan penyair), tone (sikap penyair), dan amanat (pesan moral). Tema merupakan gagasan pokok yang ingin disampaikan penyair. Feeling mencerminkan suasana hati penyair saat menciptakan puisi. Tone menunjukkan sikap penyair terhadap pembaca atau pokok persoalan. Amanat adalah pesan yang ingin disampaikan kepada pembaca.`,
+                question: 'Jodohkan unsur puisi dengan penjelasannya:',
+                leftColumn: [
+                    'Diksi',
+                    'Imaji',
+                    'Tema',
+                    'Tone',
+                    'Amanat'
+                ],
+                rightColumn: [
+                    'Pesan moral yang ingin disampaikan',
+                    'Sikap penyair terhadap pembaca',
+                    'Gambaran angan yang membantu pembaca membayangkan',
+                    'Gagasan pokok yang ingin disampaikan',
+                    'Pilihan kata untuk menciptakan efek tertentu'
+                ],
+                correct: [4, 2, 3, 1, 0],
+                explanation: 'Diksi adalah pilihan kata, Imaji adalah gambaran angan, Tema adalah gagasan pokok, Tone adalah sikap penyair, dan Amanat adalah pesan moral.'
+            },
+
+            // Isian Singkat (5 soal)
+            {
+                type: 'fill-blank',
+                passage: `Pantun merupakan salah satu bentuk puisi lama Indonesia yang memiliki struktur dan aturan tertentu. Pantun terdiri dari empat baris dalam satu bait dengan pola rima a-b-a-b. Dua baris pertama disebut sampiran yang berfungsi sebagai pengantar, sedangkan dua baris terakhir disebut isi yang mengandung maksud atau pesan yang ingin disampaikan.
+
+Pantun memiliki berbagai jenis berdasarkan isinya, seperti pantun nasihat, pantun jenaka, pantun cinta, dan pantun agama. Setiap baris pantun biasanya terdiri dari 8-12 suku kata dengan tekanan pada suku kata terakhir. Pantun sering digunakan dalam berbagai acara adat dan tradisional sebagai sarana hiburan dan penyampaian pesan.
+
+Ciri khas pantun adalah penggunaan bahasa yang sederhana namun sarat makna, mudah diingat, dan memiliki irama yang indah. Pantun juga mencerminkan kearifan lokal dan nilai-nilai budaya masyarakat Indonesia. Dalam perkembangannya, pantun tetap populer dan sering digunakan dalam berbagai konteks modern.`,
+                questions: [
+                    'Pantun terdiri dari _____ baris dalam satu bait.',
+                    'Pola rima pantun adalah _____.',
+                    'Dua baris pertama pantun disebut _____.',
+                    'Dua baris terakhir pantun disebut _____.',
+                    'Setiap baris pantun terdiri dari _____ suku kata.'
+                ],
+                answers: ['empat', 'a-b-a-b', 'sampiran', 'isi', '8-12'],
+                explanation: 'Pantun memiliki struktur empat baris dengan pola rima a-b-a-b, sampiran di dua baris pertama, isi di dua baris terakhir, dan 8-12 suku kata per baris.'
+            },
+            {
+                type: 'fill-blank',
+                passage: `Teks argumentasi adalah jenis teks yang bertujuan untuk meyakinkan pembaca tentang suatu pendapat atau gagasan melalui alasan-alasan yang logis dan bukti-bukti yang kuat. Struktur teks argumentasi terdiri dari pendahuluan, tubuh argumen, dan kesimpulan. Bagian pendahuluan berisi pengenalan topik dan pernyataan posisi penulis.
+
+Tubuh argumen merupakan bagian inti yang berisi alasan-alasan, bukti, dan data yang mendukung posisi penulis. Setiap paragraf dalam tubuh argumen biasanya membahas satu alasan utama dengan didukung oleh bukti-bukti yang relevan. Kesimpulan berisi penegasan kembali posisi penulis dan rangkuman argumen-argumen yang telah disampaikan.
+
+Ciri kebahasaan teks argumentasi meliputi penggunaan kata-kata yang menyatakan pendapat, konjungsi yang menunjukkan hubungan sebab-akibat, dan penggunaan data atau fakta untuk mendukung argumen. Teks argumentasi harus objektif, logis, dan berdasarkan pada bukti-bukti yang dapat dipertanggungjawabkan.`,
+                questions: [
+                    'Tujuan teks argumentasi adalah _____ pembaca tentang suatu pendapat.',
+                    'Struktur teks argumentasi terdiri dari pendahuluan, _____, dan kesimpulan.',
+                    'Bagian inti teks argumentasi yang berisi alasan dan bukti disebut _____.',
+                    'Ciri kebahasaan teks argumentasi menggunakan konjungsi yang menunjukkan hubungan _____.',
+                    'Teks argumentasi harus bersifat objektif, logis, dan berdasarkan _____ yang dapat dipertanggungjawabkan.'
+                ],
+                answers: ['meyakinkan', 'tubuh argumen', 'tubuh argumen', 'sebab-akibat', 'bukti'],
+                explanation: 'Teks argumentasi bertujuan meyakinkan dengan struktur pendahuluan-tubuh argumen-kesimpulan, menggunakan konjungsi sebab-akibat, dan berdasarkan bukti yang dapat dipertanggungjawabkan.'
+            },
+            {
+                type: 'fill-blank',
+                passage: `Novel merupakan karya sastra berbentuk prosa yang menceritakan kehidupan tokoh-tokoh dengan segala permasalahannya secara mendalam dan kompleks. Novel memiliki unsur intrinsik dan ekstrinsik yang membentuk kesatuan cerita. Unsur intrinsik meliputi tema, alur, tokoh dan penokohan, latar, sudut pandang, gaya bahasa, dan amanat.
+
+Tema adalah gagasan pokok atau ide sentral yang mendasari keseluruhan cerita. Alur adalah rangkaian peristiwa yang membentuk cerita dari awal hingga akhir. Tokoh adalah pelaku cerita, sedangkan penokohan adalah cara pengarang menggambarkan karakter tokoh. Latar meliputi tempat, waktu, dan suasana terjadinya peristiwa dalam cerita.
+
+Sudut pandang adalah posisi pengarang dalam menceritakan kisah, bisa berupa sudut pandang orang pertama atau orang ketiga. Gaya bahasa mencerminkan cara khas pengarang dalam menggunakan bahasa. Amanat adalah pesan moral yang ingin disampaikan pengarang kepada pembaca melalui ceritanya.`,
+                questions: [
+                    'Novel adalah karya sastra berbentuk _____ yang menceritakan kehidupan tokoh secara mendalam.',
+                    'Gagasan pokok yang mendasari keseluruhan cerita disebut _____.',
+                    'Rangkaian peristiwa yang membentuk cerita dari awal hingga akhir disebut _____.',
+                    'Cara pengarang menggambarkan karakter tokoh disebut _____.',
+                    'Pesan moral yang ingin disampaikan pengarang disebut _____.'
+                ],
+                answers: ['prosa', 'tema', 'alur', 'penokohan', 'amanat'],
+                explanation: 'Novel adalah prosa dengan unsur intrinsik: tema (gagasan pokok), alur (rangkaian peristiwa), penokohan (penggambaran karakter), dan amanat (pesan moral).'
+            },
+            {
+                type: 'fill-blank',
+                passage: `Cerpen atau cerita pendek adalah karya sastra berbentuk prosa yang menceritakan satu peristiwa atau konflik dalam kehidupan tokoh secara singkat dan padat. Cerpen memiliki ciri-ciri khusus yang membedakannya dari novel, yaitu ceritanya lebih pendek, fokus pada satu konflik utama, dan dapat dibaca dalam sekali duduk.
+
+Struktur cerpen terdiri dari orientasi, komplikasi, dan resolusi. Orientasi berisi pengenalan tokoh, latar, dan situasi awal. Komplikasi berisi konflik atau masalah yang dihadapi tokoh. Resolusi berisi penyelesaian konflik atau akhir cerita. Beberapa cerpen juga memiliki koda yang berisi pesan atau hikmah dari cerita.
+
+Teknik penulisan cerpen menekankan pada ekonomi kata, artinya setiap kata harus bermakna dan berkontribusi pada cerita. Cerpen juga sering menggunakan teknik in medias res, yaitu memulai cerita dari tengah-tengah peristiwa untuk menciptakan efek dramatis. Ending cerpen biasanya mengejutkan atau memberikan pencerahan kepada pembaca.`,
+                questions: [
+                    'Cerpen menceritakan _____ peristiwa atau konflik secara singkat dan padat.',
+                    'Cerpen dapat dibaca dalam _____ duduk.',
+                    'Bagian cerpen yang berisi pengenalan tokoh dan latar disebut _____.',
+                    'Teknik penulisan cerpen menekankan pada _____ kata.',
+                    'Teknik memulai cerita dari tengah-tengah peristiwa disebut _____.'
+                ],
+                answers: ['satu', 'sekali', 'orientasi', 'ekonomi', 'in medias res'],
+                explanation: 'Cerpen menceritakan satu konflik, dapat dibaca sekali duduk, dimulai dengan orientasi, menggunakan ekonomi kata, dan sering menerapkan teknik in medias res.'
+            },
+            {
+                type: 'fill-blank',
+                passage: `Drama adalah karya sastra yang ditulis dalam bentuk dialog dan dimaksudkan untuk dipentaskan di atas panggung. Drama memiliki unsur-unsur yang membedakannya dari karya sastra lainnya, yaitu adanya dialog, monolog, dan petunjuk laku (stage direction). Dialog adalah percakapan antar tokoh, monolog adalah pembicaraan tokoh dengan dirinya sendiri, sedangkan petunjuk laku adalah arahan untuk pementasan.
+
+Struktur drama terdiri dari babak dan adegan. Babak adalah bagian besar dalam drama yang menunjukkan perubahan waktu atau tempat yang signifikan. Adegan adalah bagian kecil dalam babak yang menunjukkan perubahan tokoh atau situasi. Drama klasik biasanya terdiri dari lima babak, sedangkan drama modern bisa bervariasi.
+
+Jenis-jenis drama berdasarkan isinya antara lain tragedi, komedi, dan drama. Tragedi adalah drama yang berakhir sedih, komedi adalah drama yang menghibur dan berakhir bahagia, sedangkan drama adalah campuran antara tragedi dan komedi. Berdasarkan bentuknya, drama dibagi menjadi drama tradisional dan drama modern.`,
+                questions: [
+                    'Drama ditulis dalam bentuk _____ dan dimaksudkan untuk dipentaskan.',
+                    'Pembicaraan tokoh dengan dirinya sendiri disebut _____.',
+                    'Arahan untuk pementasan dalam naskah drama disebut _____.',
+                    'Bagian besar dalam drama yang menunjukkan perubahan waktu atau tempat disebut _____.',
+                    'Drama yang berakhir sedih disebut _____.'
+                ],
+                answers: ['dialog', 'monolog', 'petunjuk laku', 'babak', 'tragedi'],
+                explanation: 'Drama ditulis dalam dialog, memiliki monolog dan petunjuk laku, terdiri dari babak dan adegan, dengan jenis tragedi yang berakhir sedih.'
+            }
+        ];
+
+        // Application state
+        let currentQuestion = 0;
+        let studentAnswers = {};
+        let timeLeft = 5400; // 90 minutes in seconds
+        let timerInterval;
+        let studentData = {};
+        let examResults = JSON.parse(localStorage.getItem('examResults')) || [];
+        let isTeacherLoggedIn = false;
+
+        // Teacher credentials (hidden)
+        const teacherCredentials = {
+            username: 'guru_bahasa',
+            password: 'TKA2024#'
+        };
+
+        // DOM elements
+        const studentInfo = document.getElementById('studentInfo');
+        const startExam = document.getElementById('startExam');
+        const progressSection = document.getElementById('progressSection');
+        const questionContainer = document.getElementById('questionContainer');
+        const navigation = document.getElementById('navigation');
+        const results = document.getElementById('results');
+
+        // Event listeners
+
+        startExam.addEventListener('click', () => {
+            const name = document.getElementById('studentName').value;
+            const studentClass = document.getElementById('studentClass').value;
+            const number = document.getElementById('studentNumber').value;
+
+            if (!name || !studentClass || !number) {
+                alert('Mohon lengkapi semua data siswa!');
+                return;
+            }
+
+            studentData = { name, class: studentClass, number };
+            startExamination();
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                displayQuestion();
+                updateNavigation();
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentQuestion < questionsData.length - 1) {
+                currentQuestion++;
+                displayQuestion();
+                updateNavigation();
+            }
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', submitExam);
+        document.getElementById('restartBtn').addEventListener('click', restartExam);
+
+        // Teacher portal function
+        function openTeacherPage() {
+            // Create teacher portal HTML
+            const teacherHTML = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Guru - Ujian Bahasa Indonesia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { box-sizing: border-box; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
+    <header class="bg-white shadow-lg border-b-4 border-green-600">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">👨‍🏫</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Portal Guru</h1>
+                        <p class="text-sm text-gray-600">Dashboard Monitoring Ujian Bahasa Indonesia</p>
+                    </div>
+                </div>
+                <button onclick="window.close()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                    Tutup Portal
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <!-- Login Form -->
+        <div id="loginSection" class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 fade-in">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-4xl">🔐</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Login Guru</h2>
+                <p class="text-gray-600">Masukkan kredensial untuk mengakses dashboard</p>
+            </div>
+            
+            <form id="teacherLoginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="teacherUsername" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Masukkan username" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="teacherPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Masukkan password" required>
+                </div>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition-colors">
+                    Login
+                </button>
+            </form>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboardSection" class="hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-8 fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Dashboard Monitoring</h2>
+                    <div class="flex space-x-4">
+                        <button onclick="refreshData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            🔄 Refresh
+                        </button>
+                        <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-blue-50 rounded-lg p-6">
+                        <h3 class="font-bold text-blue-800 mb-2">Total Siswa</h3>
+                        <div class="text-3xl font-bold text-blue-600" id="totalCount">0</div>
+                        <div class="text-sm text-gray-600">Telah Mengerjakan</div>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-6">
+                        <h3 class="font-bold text-green-800 mb-2">XII SATU</h3>
+                        <div class="text-3xl font-bold text-green-600" id="class1Count">0</div>
+                        <div class="text-sm text-gray-600">Siswa</div>
+                    </div>
+                    <div class="bg-purple-50 rounded-lg p-6">
+                        <h3 class="font-bold text-purple-800 mb-2">XII DUA</h3>
+                        <div class="text-3xl font-bold text-purple-600" id="class2Count">0</div>
+                        <div class="text-sm text-gray-600">Siswa</div>
+                    </div>
+                    <div class="bg-orange-50 rounded-lg p-6">
+                        <h3 class="font-bold text-orange-800 mb-2">XII TIGA</h3>
+                        <div class="text-3xl font-bold text-orange-600" id="class3Count">0</div>
+                        <div class="text-sm text-gray-600">Siswa</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                        📊 Export ke Excel
+                    </button>
+                    <button onclick="showAnswerKey()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                        📝 Kunci Jawaban
+                    </button>
+                    <button onclick="showStatistics()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                        📈 Statistik
+                    </button>
+                    <select id="classFilter" onchange="filterByClass()" class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        <option value="">Semua Kelas</option>
+                        <option value="XII SATU">XII SATU</option>
+                        <option value="XII DUA">XII DUA</option>
+                        <option value="XII TIGA">XII TIGA</option>
+                    </select>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-4 py-3 text-left">No</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left">Nama</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left">Kelas</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left">No. Absen</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left">Skor</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left">Benar</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left">Salah</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left">Waktu Selesai</th>
+                                <th class="border border-gray-300 px-4 py-3 text-left">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTable">
+                            <tr>
+                                <td colspan="9" class="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                                    Belum ada data hasil ujian
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Answer Key Modal -->
+    <div id="answerKeyModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-6xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Kunci Jawaban & Pembahasan</h3>
+                <button onclick="closeAnswerKey()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            <div id="answerKeyContent" class="space-y-6">
+                <!-- Answer keys will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div id="statisticsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-4xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Statistik Ujian</h3>
+                <button onclick="closeStatistics()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            <div id="statisticsContent">
+                <!-- Statistics will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const teacherCredentials = { username: 'guru_bahasa', password: 'TKA2024#' };
+        let examResults = [];
+        let filteredResults = [];
+
+        // Load data from localStorage
+        function loadData() {
+            examResults = JSON.parse(localStorage.getItem('examResults')) || [];
+            filteredResults = [...examResults];
+            updateStats();
+            updateTable();
+        }
+
+        // Login functionality
+        document.getElementById('teacherLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('teacherUsername').value;
+            const password = document.getElementById('teacherPassword').value;
+            
+            if (username === teacherCredentials.username && password === teacherCredentials.password) {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                loadData();
+            } else {
+                alert('Username atau password salah!');
+            }
+        });
+
+        function logout() {
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('teacherUsername').value = '';
+            document.getElementById('teacherPassword').value = '';
+        }
+
+        function refreshData() {
+            loadData();
+            alert('Data berhasil diperbarui!');
+        }
+
+        function updateStats() {
+            const total = examResults.length;
+            const class1 = examResults.filter(r => r.class === 'XII SATU').length;
+            const class2 = examResults.filter(r => r.class === 'XII DUA').length;
+            const class3 = examResults.filter(r => r.class === 'XII TIGA').length;
+            
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('class1Count').textContent = class1;
+            document.getElementById('class2Count').textContent = class2;
+            document.getElementById('class3Count').textContent = class3;
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('resultsTable');
+            
+            if (filteredResults.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="border border-gray-300 px-4 py-8 text-center text-gray-500">Belum ada data hasil ujian</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filteredResults.map((result, index) => {
+                const scoreClass = result.score >= 75 ? 'bg-green-100 text-green-800' : result.score >= 60 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800';
+                return \`
+                    <tr class="hover:bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-3">\${index + 1}</td>
+                        <td class="border border-gray-300 px-4 py-3 font-medium">\${result.name}</td>
+                        <td class="border border-gray-300 px-4 py-3">\${result.class}</td>
+                        <td class="border border-gray-300 px-4 py-3 text-center">\${result.number}</td>
+                        <td class="border border-gray-300 px-4 py-3">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium \${scoreClass}">
+                                \${result.score}
+                            </span>
+                        </td>
+                        <td class="border border-gray-300 px-4 py-3 text-center text-green-600 font-medium">\${result.correct}</td>
+                        <td class="border border-gray-300 px-4 py-3 text-center text-red-600 font-medium">\${result.wrong}</td>
+                        <td class="border border-gray-300 px-4 py-3 text-sm">\${result.timestamp}</td>
+                        <td class="border border-gray-300 px-4 py-3">
+                            <button onclick="viewDetail('\${result.name}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                Detail
+                            </button>
+                        </td>
+                    </tr>
+                \`;
+            }).join('');
+        }
+
+        function filterByClass() {
+            const selectedClass = document.getElementById('classFilter').value;
+            if (selectedClass === '') {
+                filteredResults = [...examResults];
+            } else {
+                filteredResults = examResults.filter(result => result.class === selectedClass);
+            }
+            updateTable();
+        }
+
+        function exportToExcel() {
+            if (examResults.length === 0) {
+                alert('Tidak ada data untuk diekspor!');
+                return;
+            }
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "No,Nama,Kelas,No Absen,Skor,Benar,Salah,Waktu Selesai\\n";
+            
+            examResults.forEach((result, index) => {
+                csvContent += \`\${index + 1},\${result.name},\${result.class},\${result.number},\${result.score},\${result.correct},\${result.wrong},\${result.timestamp}\\n\`;
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", \`hasil_ujian_bahasa_indonesia_\${new Date().toISOString().split('T')[0]}.csv\`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function showAnswerKey() {
+            // Answer key data would be loaded here
+            document.getElementById('answerKeyModal').classList.remove('hidden');
+            // Populate answer key content
+            document.getElementById('answerKeyContent').innerHTML = '<p class="text-center text-gray-600">Kunci jawaban akan ditampilkan di sini...</p>';
+        }
+
+        function closeAnswerKey() {
+            document.getElementById('answerKeyModal').classList.add('hidden');
+        }
+
+        function showStatistics() {
+            if (examResults.length === 0) {
+                alert('Belum ada data untuk ditampilkan!');
+                return;
+            }
+
+            const avgScore = (examResults.reduce((sum, r) => sum + r.score, 0) / examResults.length).toFixed(1);
+            const highestScore = Math.max(...examResults.map(r => r.score));
+            const lowestScore = Math.min(...examResults.map(r => r.score));
+            const passCount = examResults.filter(r => r.score >= 75).length;
+            const passRate = ((passCount / examResults.length) * 100).toFixed(1);
+
+            document.getElementById('statisticsContent').innerHTML = \`
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-blue-50 p-6 rounded-lg">
+                        <h4 class="font-bold text-blue-800 mb-4">Statistik Umum</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span>Rata-rata Skor:</span>
+                                <span class="font-bold">\${avgScore}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Skor Tertinggi:</span>
+                                <span class="font-bold text-green-600">\${highestScore}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Skor Terendah:</span>
+                                <span class="font-bold text-red-600">\${lowestScore}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Tingkat Kelulusan:</span>
+                                <span class="font-bold">\${passRate}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-green-50 p-6 rounded-lg">
+                        <h4 class="font-bold text-green-800 mb-4">Distribusi Nilai</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>A (90-100):</span>
+                                <span class="font-bold">\${examResults.filter(r => r.score >= 90).length} siswa</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>B (75-89):</span>
+                                <span class="font-bold">\${examResults.filter(r => r.score >= 75 && r.score < 90).length} siswa</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>C (60-74):</span>
+                                <span class="font-bold">\${examResults.filter(r => r.score >= 60 && r.score < 75).length} siswa</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>D (<60):</span>
+                                <span class="font-bold">\${examResults.filter(r => r.score < 60).length} siswa</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            \`;
+            
+            document.getElementById('statisticsModal').classList.remove('hidden');
+        }
+
+        function closeStatistics() {
+            document.getElementById('statisticsModal').classList.add('hidden');
+        }
+
+        function viewDetail(studentName) {
+            const student = examResults.find(r => r.name === studentName);
+            if (student) {
+                alert(\`Detail Siswa: \${student.name}\\nKelas: \${student.class}\\nSkor: \${student.score}\\nBenar: \${student.correct}\\nSalah: \${student.wrong}\\nWaktu: \${student.timestamp}\`);
+            }
+        }
+
+        // Auto refresh every 30 seconds
+        setInterval(loadData, 30000);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98ac77a473964ac2',t:'MTc1OTgzMDM0NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
+            `;
+
+            // Open teacher portal in new window
+            const teacherWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+            teacherWindow.document.write(teacherHTML);
+            teacherWindow.document.close();
+        }
+
+        // Functions
+        function startExamination() {
+            studentInfo.classList.add('hidden');
+            progressSection.classList.remove('hidden');
+            questionContainer.classList.remove('hidden');
+            navigation.classList.remove('hidden');
+            
+            startTimer();
+            displayQuestion();
+            updateProgress();
+            updateNavigation();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function displayQuestion() {
+            const question = questionsData[currentQuestion];
+            let html = `
+                <div class="bg-white rounded-xl shadow-lg p-8 question-card fade-in">
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                                Soal ${currentQuestion + 1} dari ${questionsData.length}
+                            </span>
+                            <span class="text-sm text-gray-600">${getQuestionTypeLabel(question.type)}</span>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                            <h3 class="font-bold text-gray-800 mb-3">Bacaan:</h3>
+                            <p class="text-gray-700 leading-relaxed text-justify">${question.passage}</p>
+                        </div>
+                    </div>
+            `;
+
+            switch (question.type) {
+                case 'multiple-choice':
+                    html += renderMultipleChoice(question);
+                    break;
+                case 'multiple-complex':
+                    html += renderMultipleComplex(question);
+                    break;
+                case 'true-false':
+                    html += renderTrueFalse(question);
+                    break;
+                case 'matching':
+                    html += renderMatching(question);
+                    break;
+                case 'fill-blank':
+                    html += renderFillBlank(question);
+                    break;
+            }
+
+            html += '</div>';
+            questionContainer.innerHTML = html;
+        }
+
+        function getQuestionTypeLabel(type) {
+            const labels = {
+                'multiple-choice': 'Pilihan Ganda',
+                'multiple-complex': 'Pilihan Ganda Kompleks',
+                'true-false': 'Benar Salah',
+                'matching': 'Menjodohkan',
+                'fill-blank': 'Isian Singkat'
+            };
+            return labels[type] || type;
+        }
+
+        function renderMultipleChoice(question) {
+            let html = `<h3 class="text-lg font-bold text-gray-800 mb-4">${question.question}</h3>`;
+            html += '<div class="space-y-3">';
+            
+            question.options.forEach((option, index) => {
+                const isChecked = studentAnswers[currentQuestion] === index;
+                html += `
+                    <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors">
+                        <input type="radio" name="q${currentQuestion}" value="${index}" 
+                               class="mr-3 text-blue-600" ${isChecked ? 'checked' : ''}
+                               onchange="saveAnswer(${currentQuestion}, ${index})">
+                        <span class="font-medium text-gray-700 mr-3">${String.fromCharCode(65 + index)}.</span>
+                        <span class="text-gray-700">${option}</span>
+                    </label>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        function renderMultipleComplex(question) {
+            let html = `<h3 class="text-lg font-bold text-gray-800 mb-4">${question.question}</h3>`;
+            html += '<p class="text-sm text-gray-600 mb-4">Pilih semua jawaban yang benar:</p>';
+            html += '<div class="space-y-3">';
+            
+            question.options.forEach((option, index) => {
+                const isChecked = studentAnswers[currentQuestion] && studentAnswers[currentQuestion].includes(index);
+                html += `
+                    <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors">
+                        <input type="checkbox" value="${index}" 
+                               class="mr-3 text-blue-600" ${isChecked ? 'checked' : ''}
+                               onchange="saveComplexAnswer(${currentQuestion}, ${index})">
+                        <span class="font-medium text-gray-700 mr-3">${String.fromCharCode(65 + index)}.</span>
+                        <span class="text-gray-700">${option}</span>
+                    </label>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        function renderTrueFalse(question) {
+            let html = '<div class="space-y-6">';
+            
+            question.statements.forEach((statement, index) => {
+                const answer = studentAnswers[currentQuestion] && studentAnswers[currentQuestion][index];
+                html += `
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <p class="text-gray-800 mb-3">${index + 1}. ${statement}</p>
+                        <div class="flex space-x-6">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="tf${currentQuestion}_${index}" value="true" 
+                                       class="mr-2 text-green-600" ${answer === true ? 'checked' : ''}
+                                       onchange="saveTrueFalseAnswer(${currentQuestion}, ${index}, true)">
+                                <span class="text-green-700 font-medium">Benar</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="tf${currentQuestion}_${index}" value="false" 
+                                       class="mr-2 text-red-600" ${answer === false ? 'checked' : ''}
+                                       onchange="saveTrueFalseAnswer(${currentQuestion}, ${index}, false)">
+                                <span class="text-red-700 font-medium">Salah</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        function renderMatching(question) {
+            let html = `<h3 class="text-lg font-bold text-gray-800 mb-4">${question.question}</h3>`;
+            html += '<div class="grid md:grid-cols-2 gap-6">';
+            
+            // Left column
+            html += '<div><h4 class="font-bold text-gray-700 mb-3">Kolom A</h4><div class="space-y-2">';
+            question.leftColumn.forEach((item, index) => {
+                html += `<div class="p-3 bg-blue-50 rounded-lg">${index + 1}. ${item}</div>`;
+            });
+            html += '</div></div>';
+            
+            // Right column with dropdowns
+            html += '<div><h4 class="font-bold text-gray-700 mb-3">Kolom B</h4><div class="space-y-2">';
+            question.rightColumn.forEach((item, index) => {
+                html += `<div class="p-3 bg-gray-50 rounded-lg">${String.fromCharCode(97 + index)}. ${item}</div>`;
+            });
+            html += '</div></div>';
+            
+            html += '</div>';
+            
+            // Matching inputs
+            html += '<div class="mt-6"><h4 class="font-bold text-gray-700 mb-3">Jawaban Anda:</h4><div class="grid md:grid-cols-2 gap-4">';
+            question.leftColumn.forEach((item, index) => {
+                const savedAnswer = studentAnswers[currentQuestion] && studentAnswers[currentQuestion][index];
+                html += `
+                    <div class="flex items-center space-x-3">
+                        <span class="font-medium">${index + 1}.</span>
+                        <select class="flex-1 p-2 border border-gray-300 rounded-lg" 
+                                onchange="saveMatchingAnswer(${currentQuestion}, ${index}, this.value)">
+                            <option value="">Pilih jawaban</option>
+                `;
+                question.rightColumn.forEach((_, optIndex) => {
+                    const isSelected = savedAnswer == optIndex;
+                    html += `<option value="${optIndex}" ${isSelected ? 'selected' : ''}>${String.fromCharCode(97 + optIndex)}</option>`;
+                });
+                html += '</select></div>';
+            });
+            html += '</div></div>';
+            
+            return html;
+        }
+
+        function renderFillBlank(question) {
+            let html = '<div class="space-y-4">';
+            
+            question.questions.forEach((q, index) => {
+                const savedAnswer = studentAnswers[currentQuestion] && studentAnswers[currentQuestion][index];
+                html += `
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <label class="block text-gray-800 mb-2">${index + 1}. ${q}</label>
+                        <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" 
+                               placeholder="Masukkan jawaban Anda" value="${savedAnswer || ''}"
+                               onchange="saveFillBlankAnswer(${currentQuestion}, ${index}, this.value)">
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        // Answer saving functions
+        function saveAnswer(questionIndex, answerIndex) {
+            studentAnswers[questionIndex] = answerIndex;
+            updateProgress();
+        }
+
+        function saveComplexAnswer(questionIndex, optionIndex) {
+            if (!studentAnswers[questionIndex]) {
+                studentAnswers[questionIndex] = [];
+            }
+            
+            const answers = studentAnswers[questionIndex];
+            const index = answers.indexOf(optionIndex);
+            
+            if (index > -1) {
+                answers.splice(index, 1);
+            } else {
+                answers.push(optionIndex);
+            }
+            
+            updateProgress();
+        }
+
+        function saveTrueFalseAnswer(questionIndex, statementIndex, value) {
+            if (!studentAnswers[questionIndex]) {
+                studentAnswers[questionIndex] = {};
+            }
+            studentAnswers[questionIndex][statementIndex] = value;
+            updateProgress();
+        }
+
+        function saveMatchingAnswer(questionIndex, leftIndex, rightIndex) {
+            if (!studentAnswers[questionIndex]) {
+                studentAnswers[questionIndex] = {};
+            }
+            studentAnswers[questionIndex][leftIndex] = parseInt(rightIndex);
+            updateProgress();
+        }
+
+        function saveFillBlankAnswer(questionIndex, blankIndex, value) {
+            if (!studentAnswers[questionIndex]) {
+                studentAnswers[questionIndex] = {};
+            }
+            studentAnswers[questionIndex][blankIndex] = value.trim();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const answered = Object.keys(studentAnswers).length;
+            const total = questionsData.length;
+            const percentage = (answered / total) * 100;
+            
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            document.getElementById('progressText').textContent = `${answered}/${total}`;
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentQuestion === 0;
+            nextBtn.disabled = currentQuestion === questionsData.length - 1;
+            
+            if (prevBtn.disabled) {
+                prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            
+            if (nextBtn.disabled) {
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function submitExam() {
+            clearInterval(timerInterval);
+            
+            const score = calculateScore();
+            const timeUsed = 5400 - timeLeft;
+            
+            const result = {
+                ...studentData,
+                score: score.total,
+                correct: score.correct,
+                wrong: score.wrong,
+                timeUsed: formatTime(timeUsed),
+                timestamp: new Date().toLocaleString('id-ID'),
+                answers: studentAnswers
+            };
+            
+            examResults.push(result);
+            localStorage.setItem('examResults', JSON.stringify(examResults));
+            
+            showResults(score);
+        }
+
+        function calculateScore() {
+            let correct = 0;
+            let total = questionsData.length;
+            
+            questionsData.forEach((question, index) => {
+                const userAnswer = studentAnswers[index];
+                
+                switch (question.type) {
+                    case 'multiple-choice':
+                        if (userAnswer === question.correct) correct++;
+                        break;
+                    case 'multiple-complex':
+                        if (userAnswer && arraysEqual(userAnswer.sort(), question.correct.sort())) correct++;
+                        break;
+                    case 'true-false':
+                        if (userAnswer && checkTrueFalseAnswers(userAnswer, question.correct)) correct++;
+                        break;
+                    case 'matching':
+                        if (userAnswer && checkMatchingAnswers(userAnswer, question.correct)) correct++;
+                        break;
+                    case 'fill-blank':
+                        if (userAnswer && checkFillBlankAnswers(userAnswer, question.answers)) correct++;
+                        break;
+                }
+            });
+            
+            return {
+                correct,
+                wrong: total - correct,
+                total: Math.round((correct / total) * 100)
+            };
+        }
+
+        function arraysEqual(a, b) {
+            return a.length === b.length && a.every((val, i) => val === b[i]);
+        }
+
+        function checkTrueFalseAnswers(userAnswers, correctAnswers) {
+            return correctAnswers.every((correct, index) => userAnswers[index] === correct);
+        }
+
+        function checkMatchingAnswers(userAnswers, correctAnswers) {
+            return correctAnswers.every((correct, index) => userAnswers[index] === correct);
+        }
+
+        function checkFillBlankAnswers(userAnswers, correctAnswers) {
+            return correctAnswers.every((correct, index) => {
+                const userAnswer = userAnswers[index] ? userAnswers[index].toLowerCase() : '';
+                return userAnswer === correct.toLowerCase();
+            });
+        }
+
+        function showResults(score) {
+            progressSection.classList.add('hidden');
+            questionContainer.classList.add('hidden');
+            navigation.classList.add('hidden');
+            results.classList.remove('hidden');
+            
+            document.getElementById('finalScore').textContent = score.total;
+            document.getElementById('correctAnswers').textContent = score.correct;
+            document.getElementById('wrongAnswers').textContent = score.wrong;
+        }
+
+        function restartExam() {
+            currentQuestion = 0;
+            studentAnswers = {};
+            timeLeft = 5400;
+            studentData = {};
+            
+            results.classList.add('hidden');
+            studentInfo.classList.remove('hidden');
+            
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentClass').value = '';
+            document.getElementById('studentNumber').value = '';
+            
+            updateTimerDisplay();
+        }
+
+
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Initialize
+        updateTimerDisplay();
+    </script>
+</body>
+</html>
